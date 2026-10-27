@@ -4,9 +4,11 @@
 html,body{height:100%;margin:0;overflow:hidden}
 body{font-family:"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.4;background:var(--bg);color:var(--ink)}
 main{height:100%;display:flex;flex-direction:column;padding:8px 10px;gap:8px;overflow:hidden}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex:none}
-.tabs{display:flex;gap:6px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex:none;flex-wrap:wrap}
+.tabs{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.sep{width:1px;height:22px;background:var(--blue);margin:0 4px}
 .tab{border:2px solid var(--teal);background:var(--white);color:var(--teal);font:600 14px "Segoe UI",sans-serif;padding:4px 16px;border-radius:999px;cursor:pointer;transition:background .15s,color .15s}
+.tab.rg{border-radius:8px;padding:4px 12px;font-size:13px}
 .tab:hover{background:var(--mint)}
 .tab.active{background:var(--teal);color:var(--white)}
 .right{display:flex;align-items:center;gap:8px}
@@ -32,6 +34,7 @@ svg{display:block}
 .pt .dot{stroke:var(--white);stroke-width:1.5;transition:r .12s}
 .pt:hover .dot,.pt:focus .dot{r:6.5}
 .hit{fill:transparent}
+.lhit{fill:none;stroke:transparent;stroke-width:14;stroke-linejoin:round;pointer-events:stroke;cursor:pointer}
 .legend{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;flex:none}
 .lg{display:flex;align-items:center;gap:6px;padding:2px 9px;border:1px solid var(--blue);border-radius:999px;background:var(--white);font-size:12px;cursor:pointer;transition:background .15s}
 .lg:hover{background:var(--mint)}
@@ -50,6 +53,10 @@ svg{display:block}
 <button type="button" class="tab active" data-c="USD">USD</button>
 <button type="button" class="tab" data-c="SGD">SGD</button>
 <button type="button" class="tab" data-c="EUR">EUR</button>
+<span class="sep"></span>
+<button type="button" class="tab rg active" data-r="7">Last 7 days</button>
+<button type="button" class="tab rg" data-r="30">Last 30 days</button>
+<button type="button" class="tab rg" data-r="all">All time</button>
 </div>
 <div class="right"><div class="ld-status" id="ld-status-yh0vne1"></div><button type="button" class="ld-refresh" id="ld-refresh-yh0vne1" title="Re-fetch the source files">&#x21BB; Refresh</button></div>
 </div>
@@ -67,11 +74,13 @@ function idr(n){return Math.round(n).toLocaleString('id-ID')}
 var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function lab(k){var p=k.split('-');return(+p[2])+' '+MON[+p[1]-1]}
 function labFull(k){return lab(k)+' '+k.slice(0,4)}
+function dkey(x){return x.getFullYear()+'-'+('0'+(x.getMonth()+1)).slice(-2)+'-'+('0'+x.getDate()).slice(-2)}
 
 var BANK_COLORS=['#0A6A7D','#962C2C','#4A78A6','#5B8F86'];
 var TYPE_DASH=['','9 6','2 6','12 5 2 5'];
+var RANGE_LABEL={'7':'last 7 days','30':'last 30 days','all':'all time'};
 
-var active='USD',DATA=null,ERR=null;
+var active='USD',range='7',DATA=null,ERR=null;
 
 /* Parse once into per-currency records */
 function build(results){
@@ -81,19 +90,19 @@ var B=findCol(H,'Bank'),C=findCol(H,'Currency'),T=findCol(H,'RateType'),V=findCo
 if(!B||!C||!T||!V||!D)return{err:'Required rate columns are missing.'};
 function n(x){x=parseFloat(String(x==null?'':x).replace(/[^0-9.-]/g,''));return isFinite(x)?x:null}
 function dt(x){x=new Date(x);return isNaN(x)?null:x}
-function key(x){return x.getFullYear()+'-'+('0'+(x.getMonth()+1)).slice(-2)+'-'+('0'+x.getDate()).slice(-2)}
 var all={SGD:[],USD:[],EUR:[]},banks={},types={};
 rows.forEach(function(x){var c=String(x[C]||'').toUpperCase(),v=n(x[V]),d=dt(x[D]);
-if(all[c]&&v!=null&&d){var b=String(x[B]),t=String(x[T]);banks[b]=1;types[t]=1;all[c].push({b:b,t:t,v:v,d:key(d)})}});
+if(all[c]&&v!=null&&d){var b=String(x[B]),t=String(x[T]);banks[b]=1;types[t]=1;all[c].push({b:b,t:t,v:v,d:dkey(d)})}});
 return{all:all,bankList:Object.keys(banks).sort(),typeList:Object.keys(types).sort()}}
 
-/* Draw the active currency, sized to the space available (no scrolling) */
+/* Draw the active currency + range, sized to the space available (no scrolling) */
 function draw(){
 var cEl=document.getElementById('ld-content-'+_nonce);if(!cEl)return;
 if(!DATA){return}
 if(DATA.err){cEl.innerHTML='<p class="msg">'+esc(DATA.err)+'</p>';return}
 var c=active,a=DATA.all[c],bankList=DATA.bankList,typeList=DATA.typeList;
-if(!a||!a.length){cEl.innerHTML='<section class="card"><p class="sub">No live records available for '+c+'.</p></section>';return}
+if(a&&range!=='all'){var cut=dkey(new Date(Date.now()-(+range-1)*86400000));a=a.filter(function(x){return x.d>=cut})}
+if(!a||!a.length){cEl.innerHTML='<section class="card"><p class="sub">No live records available for '+c+' ('+RANGE_LABEL[range]+').</p></section>';return}
 var series={},dates={};
 a.forEach(function(x){var k=x.b+'|'+x.t;dates[x.d]=1;(series[k]=series[k]||{b:x.b,t:x.t,p:{}}).p[x.d]=x.v});
 var xs=Object.keys(dates).sort(),ks=Object.keys(series).sort();
@@ -102,7 +111,7 @@ ks.forEach(function(k){var s=series[k],last=null;
 xs.forEach(function(x){if(s.p[x]!=null)last=s.p[x]});
 meta[k]={col:BANK_COLORS[bankList.indexOf(s.b)%BANK_COLORS.length],dash:TYPE_DASH[typeList.indexOf(s.t)%TYPE_DASH.length],last:last}});
 var leg=ks.map(function(k){var s=series[k],m=meta[k];return '<div class="lg" data-k="'+esc(k)+'"><svg width="26" height="8" style="width:26px;flex:none"><line x1="2" y1="4" x2="24" y2="4" stroke="'+m.col+'" stroke-width="3" stroke-linecap="round" stroke-dasharray="'+m.dash+'"/></svg><b>'+esc(s.b)+' &ndash; '+esc(s.t)+'</b><span>Rp '+idr(m.last)+'</span></div>'}).join('');
-cEl.innerHTML='<section class="card"><p class="sub">'+c+' to IDR &middot; buy rate &middot; hover a dot for its value</p><div class="wrap"></div><div class="legend">'+leg+'</div></section>';
+cEl.innerHTML='<section class="card"><p class="sub">'+c+' to IDR &middot; buy rate &middot; '+RANGE_LABEL[range]+' &middot; hover a dot for its value</p><div class="wrap"></div><div class="legend">'+leg+'</div></section>';
 var wrap=cEl.querySelector('.wrap');
 var W=Math.max(260,wrap.clientWidth-8),HH=Math.max(110,wrap.clientHeight-8);
 var vs=a.map(function(x){return x.v}),lo=Math.min.apply(null,vs),hi=Math.max.apply(null,vs),pad=(hi-lo)*.12||1;lo-=pad;hi+=pad;
@@ -114,16 +123,19 @@ for(var g=0;g<5;g++){var y=TT+g*ph/4,val=hi-g*(hi-lo)/4;svg+='<line class="grid"
 xs.forEach(function(q,i){if(i%step===0||i===xs.length-1)svg+='<text class="axis" x="'+X(i)+'" y="'+(HH-BB+18)+'" text-anchor="middle">'+lab(q)+'</text>'});
 ks.forEach(function(k){var s=series[k],m=meta[k],pts=[];
 xs.forEach(function(x,j){if(s.p[x]!=null)pts.push([X(j),Y(s.p[x]),s.p[x],x])});
-svg+='<g class="ser" data-k="'+esc(k)+'"><polyline class="line" stroke="'+m.col+'" stroke-dasharray="'+m.dash+'" points="'+pts.map(function(z){return z[0]+','+z[1]}).join(' ')+'"/>';
+var pstr=pts.map(function(z){return z[0]+','+z[1]}).join(' ');
+svg+='<g class="ser" data-k="'+esc(k)+'"><polyline class="line" stroke="'+m.col+'" stroke-dasharray="'+m.dash+'" points="'+pstr+'"/><polyline class="lhit" data-k="'+esc(k)+'" points="'+pstr+'"/>';
 pts.forEach(function(z){svg+='<g class="pt" tabindex="0" data-k="'+esc(k)+'" data-b="'+esc(s.b)+'" data-t="'+esc(s.t)+'" data-c="'+m.col+'" data-v="'+idr(z[2])+'" data-d="'+labFull(z[3])+'" aria-label="'+esc(s.b+' '+s.t+', '+labFull(z[3])+': Rp '+idr(z[2]))+'"><circle class="hit" cx="'+z[0]+'" cy="'+z[1]+'" r="12"/><circle class="dot" cx="'+z[0]+'" cy="'+z[1]+'" r="4" fill="'+m.col+'"/></g>'});
 svg+='</g>'});
 svg+='</svg>';
 wrap.innerHTML=svg}
 
-/* Tabs */
+/* Tabs: currency (data-c) and range (data-r) */
 var tabsEl=document.getElementById('ld-tabs-'+_nonce);
-tabsEl.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.tab');if(!b)return;active=b.getAttribute('data-c');
-Array.prototype.forEach.call(tabsEl.querySelectorAll('.tab'),function(t){t.classList.toggle('active',t===b)});
+tabsEl.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.tab');if(!b)return;
+var isRange=b.hasAttribute('data-r');
+if(isRange){range=b.getAttribute('data-r')}else{active=b.getAttribute('data-c')}
+Array.prototype.forEach.call(tabsEl.querySelectorAll('.tab'),function(t){if(t.hasAttribute('data-r')===isRange)t.classList.toggle('active',t===b)});
 tip.style.display='none';draw()});
 
 /* Tooltip + series highlight (event delegation) */
@@ -135,6 +147,12 @@ function focusSeries(card,k,on){if(!card)return;var ch=card.querySelector('.char
 Array.prototype.forEach.call(ch.querySelectorAll('.ser'),function(s){s.classList.toggle('on',on&&s.getAttribute('data-k')===k)});ch.classList.toggle('focus',on)}
 function over(e){var t=e.target.closest&&e.target.closest('.pt,.lg');if(!t)return;if(t.classList.contains('pt'))showTip(t);focusSeries(t.closest('.card'),t.getAttribute('data-k'),true)}
 function out(e){var t=e.target.closest&&e.target.closest('.pt,.lg');if(!t)return;tip.style.display='none';focusSeries(t.closest('.card'),t.getAttribute('data-k'),false)}
+function lineMove(e){var t=e.target;if(!t.classList||!t.classList.contains('lhit'))return;
+var pts=t.parentNode.querySelectorAll('.pt'),best=null,bd=1e9;
+Array.prototype.forEach.call(pts,function(p){var r=p.getBoundingClientRect(),d=Math.abs(r.left+r.width/2-e.clientX);if(d<bd){bd=d;best=p}});
+if(best)showTip(best);focusSeries(t.closest('.card'),t.getAttribute('data-k'),true)}
+function lineOut(e){var t=e.target;if(!t.classList||!t.classList.contains('lhit'))return;tip.style.display='none';focusSeries(t.closest('.card'),t.getAttribute('data-k'),false)}
+document.addEventListener('mousemove',lineMove);document.addEventListener('mouseout',lineOut);
 document.addEventListener('mouseover',over);document.addEventListener('mouseout',out);document.addEventListener('focusin',over);document.addEventListener('focusout',out);
 
 var statusEl=document.getElementById('ld-status-'+_nonce),refreshBtn=document.getElementById('ld-refresh-'+_nonce);
