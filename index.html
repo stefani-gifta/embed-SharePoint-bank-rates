@@ -1,0 +1,140 @@
+<!doctype html><html><head><meta name="ms-sp-authoring-source" content="agent"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bank Exchange Rates</title><style>
+:root{--teal:#0A6A7D;--bg:#F0F0F0;--blue:#C3D7EB;--mint:#E8F3F1;--red:#962C2C;--white:#FEFEFE;--ink:#0B2E36}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.5;background:var(--bg);color:var(--ink)}
+main{max-width:1180px;margin:40px auto;padding:0 24px}
+.hero{background:var(--teal);color:var(--white);padding:40px 44px;border-radius:20px}
+.hero h1{margin:0 0 8px;font-size:40px;line-height:1.15;font-weight:700}
+.hero p{margin:0;font-size:20px;opacity:.92}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:26px 0 16px}
+.toolbar h2{margin:0;font-size:24px;font-weight:600;color:var(--teal)}
+.ld-status{font-size:15px;color:var(--teal)}
+.ld-status.err{color:var(--red)}
+.ld-refresh{border:2px solid var(--teal);background:var(--white);color:var(--teal);font:600 16px "Segoe UI",sans-serif;padding:8px 18px;border-radius:10px;cursor:pointer;transition:background .15s,color .15s}
+.ld-refresh:hover{background:var(--teal);color:var(--white)}
+.ld-refresh:disabled{opacity:.6;cursor:default}
+.card{margin:0 0 26px;padding:26px;border:1px solid var(--blue);border-radius:18px;background:var(--white)}
+.card h3{margin:0 0 4px;font-size:26px;font-weight:700;color:var(--teal)}
+.sub{margin:0 0 18px;font-size:16px;color:var(--ink);opacity:.75}
+.wrap{overflow:hidden;background:var(--mint);border-radius:14px;padding:8px}
+svg{display:block;width:100%;height:auto}
+.axis{font:15px "Segoe UI",Arial,sans-serif;fill:var(--ink)}
+.grid{stroke:var(--blue);stroke-width:1}
+.line{fill:none;stroke-width:3.2;stroke-linejoin:round;stroke-linecap:round}
+.ser{transition:opacity .15s}
+.chart.focus .ser{opacity:.15}
+.chart.focus .ser.on{opacity:1}
+.chart.focus .ser.on .line{stroke-width:4.2}
+.pt{cursor:pointer;outline:none}
+.pt .dot{stroke:var(--white);stroke-width:2;transition:r .12s}
+.pt:hover .dot,.pt:focus .dot{r:8.5}
+.hit{fill:transparent}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.lg{display:flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid var(--blue);border-radius:999px;background:var(--white);font-size:16px;cursor:pointer;transition:background .15s}
+.lg:hover{background:var(--mint)}
+.lg b{font-weight:600}
+.lg span{color:var(--teal);font-weight:600}
+.tip{position:fixed;display:none;z-index:99;pointer-events:none;min-width:190px;padding:12px 16px;border-radius:12px;background:var(--ink);color:var(--white);box-shadow:0 6px 20px rgba(11,46,54,.28)}
+.tip .tt{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600}
+.tip .tt i{width:12px;height:12px;border-radius:50%;border:2px solid var(--white)}
+.tip .tv{font-size:26px;font-weight:700;margin:4px 0 0;line-height:1.2}
+.tip .td{font-size:14px;color:var(--blue)}
+.msg{font-size:18px;color:var(--red)}
+@media(max-width:650px){main{margin:16px auto;padding:0 12px}.hero{padding:26px 22px}.hero h1{font-size:30px}.card{padding:16px}}
+</style></head><body><main>
+<section class="hero"><h1>Bank Exchange Rates</h1><p>Live IDR buy-rate trends for BCA, BRI, and Mandiri.</p></section>
+<script type="application/json" class="ka-livedata-manifest">[{"kind":"list","spItemUrl":"list:https://solusindocorp.sharepoint.com/sites/SolusiCopilotExperienceHub/{5094ac18-ea5b-4af0-b617-1a8e556966df}","webUrl":"https://solusindocorp.sharepoint.com/sites/SolusiCopilotExperienceHub","listId":"{5094ac18-ea5b-4af0-b617-1a8e556966df}","label":"Bank Exchange Rates"}]</script>
+<div class="ld-fragment" id="ld-fragment-yh0vne1">
+<div class="toolbar"><div><h2>Live rate trends</h2><div class="ld-status" id="ld-status-yh0vne1"></div></div><button type="button" class="ld-refresh" id="ld-refresh-yh0vne1" title="Re-fetch the source files">&#x21BB; Refresh</button></div>
+<div id="ld-content-yh0vne1">Loading live rates…</div></div>
+<script>(function(){var _nonce="yh0vne1";var CONFIG={"items":[{"kind":"list","spItemUrl":"list:https://solusindocorp.sharepoint.com/sites/SolusiCopilotExperienceHub/{5094ac18-ea5b-4af0-b617-1a8e556966df}","webUrl":"https://solusindocorp.sharepoint.com/sites/SolusiCopilotExperienceHub","listId":"{5094ac18-ea5b-4af0-b617-1a8e556966df}","label":"Bank Exchange Rates"}],"title":"Live rate trends"};
+function splitLine(line,sep){var result=[],cur='',inQ=false;for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++}else{inQ=!inQ}}else if(ch===sep&&!inQ){result.push(cur);cur=''}else{cur+=ch}}result.push(cur);return result}
+function _parseDelimited(content){var lines=content.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(function(l){return l.trim()});if(lines.length<2)return{headers:[],rows:[]};var sep=lines[0].indexOf('\t')!==-1?'\t':',';var headers=splitLine(lines[0],sep).map(function(h){return h.trim()});var rows=[];for(var i=1;i<lines.length;i++){var cols=splitLine(lines[i],sep);var row={};for(var j=0;j<headers.length;j++){row[headers[j]]=(cols[j]||'').trim()}rows.push(row)}return{headers:headers,rows:rows}}
+function extractSheets(content){var sheets=[];var re=/<sheet name="([^"]*)">([\s\S]*?)<\/sheet>/g;var m;while((m=re.exec(content))!==null){sheets.push({name:m[1],csv:m[2]})}return sheets}
+function loadTabular(result){if(!result||result.content==null)return null;if(result.format==='rows'){var listData;try{listData=JSON.parse(result.content)}catch(e){return null}if(!listData||!listData.headers)return null;var headers=listData.headers,rawRows=listData.rows||[],keyedRows=[];for(var r=0;r<rawRows.length;r++){var cv=rawRows[r];if(cv&&typeof cv==='object'&&!(cv instanceof Array)){keyedRows.push(cv);continue}var kr={};for(var c=0;c<headers.length;c++){kr[headers[c]]=cv&&cv[c]!=null?cv[c]:''}keyedRows.push(kr)}return{headers:headers,rows:keyedRows}}if(result.format==='xlsx-sheets'){var sheets=extractSheets(result.content);if(sheets.length===0)return null;return _parseDelimited(sheets[0].csv)}return _parseDelimited(result.content)}
+function _normHeader(s){return(''+s).toLowerCase().replace(/_x([0-9a-f]{4})_/g,function(_m,h){return String.fromCharCode(parseInt(h,16))}).replace(/_0x([0-9a-f]+)_/g,function(_m,h){return String.fromCharCode(parseInt(h,16))}).replace(/[\s_]+/g,'')}
+function findCol(headers,name){if(!name)return null;var target=_normHeader(name);if(!target)return null;var i;for(i=0;i<headers.length;i++){if(_normHeader(headers[i])===target)return headers[i]}for(i=0;i<headers.length;i++){if(_normHeader(headers[i]).indexOf(target)!==-1)return headers[i]}return null}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function idr(n){return Math.round(n).toLocaleString('id-ID')}
+var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function lab(k){var p=k.split('-');return(+p[2])+' '+MON[+p[1]-1]}
+function labFull(k){return lab(k)+' '+k.slice(0,4)}
+
+/* Palette-based series colours: one colour per bank; rate type = line style */
+var BANK_COLORS=['#0A6A7D','#962C2C','#4A78A6','#5B8F86'];
+var TYPE_DASH=['','9 6','2 6','12 5 2 5'];
+
+function render(results){
+var r=results&&results[0],H=r&&r.headers||[],rows=r&&r.rows||[];
+if(!r||r.error)return '<p class="msg">Live data failed to load.</p>';
+var B=findCol(H,'Bank'),C=findCol(H,'Currency'),T=findCol(H,'RateType'),V=findCol(H,'Buy'),D=findCol(H,'FetchedDate');
+if(!B||!C||!T||!V||!D)return '<p class="msg">Required rate columns are missing.</p>';
+function n(x){x=parseFloat(String(x==null?'':x).replace(/[^0-9.-]/g,''));return isFinite(x)?x:null}
+function dt(x){x=new Date(x);return isNaN(x)?null:x}
+function key(x){return x.getFullYear()+'-'+('0'+(x.getMonth()+1)).slice(-2)+'-'+('0'+x.getDate()).slice(-2)}
+var all={SGD:[],USD:[],EUR:[]},banks={},types={};
+rows.forEach(function(x){var c=String(x[C]||'').toUpperCase(),v=n(x[V]),d=dt(x[D]);
+if(all[c]&&v!=null&&d){var b=String(x[B]),t=String(x[T]);banks[b]=1;types[t]=1;all[c].push({b:b,t:t,v:v,d:key(d)})}});
+var bankList=Object.keys(banks).sort(),typeList=Object.keys(types).sort();
+var out='';
+Object.keys(all).forEach(function(c){
+var a=all[c];
+if(!a.length){out+='<section class="card"><h3>'+c+' to IDR</h3><p class="sub">No live records available.</p></section>';return}
+var series={},dates={};
+a.forEach(function(x){var k=x.b+'|'+x.t;dates[x.d]=1;(series[k]=series[k]||{b:x.b,t:x.t,p:{}}).p[x.d]=x.v});
+var xs=Object.keys(dates).sort(),ks=Object.keys(series).sort();
+var vs=a.map(function(x){return x.v}),lo=Math.min.apply(null,vs),hi=Math.max.apply(null,vs),pad=(hi-lo)*.12||1;lo-=pad;hi+=pad;
+var cEl=document.getElementById('ld-content-'+_nonce),cw=(cEl&&cEl.clientWidth)||900,W=Math.max(280,Math.floor(cw-52-16)),HH=Math.max(260,Math.min(400,Math.round(W*.5))),sm=W<520,L=sm?66:84,R=sm?14:24,TT=26,BB=58,pw=W-L-R,ph=HH-TT-BB;
+var X=function(i){return L+(xs.length<2?pw/2:i*pw/(xs.length-1))},Y=function(v){return TT+(hi-v)*ph/(hi-lo)};
+var step=Math.ceil(xs.length/Math.max(2,Math.floor(pw/80)));
+var svg='<svg class="chart" viewBox="0 0 '+W+' '+HH+'" width="'+W+'" height="'+HH+'">';
+for(var g=0;g<5;g++){var y=TT+g*ph/4,val=hi-g*(hi-lo)/4;svg+='<line class="grid" x1="'+L+'" y1="'+y+'" x2="'+(W-R)+'" y2="'+y+'"/><text class="axis" x="'+(L-10)+'" y="'+(y+5)+'" text-anchor="end">'+idr(val)+'</text>'}
+xs.forEach(function(q,i){if(i%step===0||i===xs.length-1)svg+='<text class="axis" x="'+X(i)+'" y="'+(HH-BB+30)+'" text-anchor="middle">'+lab(q)+'</text>'});
+var meta={};
+ks.forEach(function(k){var s=series[k],col=BANK_COLORS[bankList.indexOf(s.b)%BANK_COLORS.length],dash=TYPE_DASH[typeList.indexOf(s.t)%TYPE_DASH.length],pts=[],last=null;
+xs.forEach(function(x,j){if(s.p[x]!=null){pts.push([X(j),Y(s.p[x]),s.p[x],x]);last=s.p[x]}});
+meta[k]={col:col,dash:dash,last:last};
+svg+='<g class="ser" data-k="'+esc(k)+'"><polyline class="line" stroke="'+col+'" stroke-dasharray="'+dash+'" points="'+pts.map(function(z){return z[0]+','+z[1]}).join(' ')+'"/>';
+pts.forEach(function(z){svg+='<g class="pt" tabindex="0" data-k="'+esc(k)+'" data-b="'+esc(s.b)+'" data-t="'+esc(s.t)+'" data-c="'+col+'" data-v="'+idr(z[2])+'" data-d="'+labFull(z[3])+'" aria-label="'+esc(s.b+' '+s.t+', '+labFull(z[3])+': Rp '+idr(z[2]))+'"><circle class="hit" cx="'+z[0]+'" cy="'+z[1]+'" r="15"/><circle class="dot" cx="'+z[0]+'" cy="'+z[1]+'" r="5.5" fill="'+col+'"/></g>'});
+svg+='</g>'});
+svg+='</svg>';
+var leg=ks.map(function(k){var s=series[k],m=meta[k];return '<div class="lg" data-k="'+esc(k)+'"><svg width="34" height="10" style="width:34px;flex:none"><line x1="2" y1="5" x2="32" y2="5" stroke="'+m.col+'" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="'+m.dash+'"/></svg><b>'+esc(s.b)+' – '+esc(s.t)+'</b><span>Rp '+idr(m.last)+'</span></div>'}).join('');
+out+='<section class="card"><h3>'+c+' to IDR</h3><p class="sub">Buy rate by bank and rate type. Hover a dot to see its value.</p><div class="wrap">'+svg+'</div><div class="legend">'+leg+'</div></section>'});
+return out}
+
+/* Tooltip + series highlight (event delegation) */
+var tip=document.createElement('div');tip.className='tip';document.body.appendChild(tip);
+function showTip(g){tip.innerHTML='<div class="tt"><i style="background:'+g.getAttribute('data-c')+'"></i>'+esc(g.getAttribute('data-b'))+' – '+esc(g.getAttribute('data-t'))+'</div><div class="tv">Rp '+esc(g.getAttribute('data-v'))+'</div><div class="td">'+esc(g.getAttribute('data-d'))+'</div>';tip.style.display='block';
+var rc=g.getBoundingClientRect(),tw=tip.offsetWidth,th=tip.offsetHeight,x=rc.left+rc.width/2-tw/2,y=rc.top-th-4;
+x=Math.max(8,Math.min(x,window.innerWidth-tw-8));if(y<8)y=rc.bottom+4;tip.style.left=x+'px';tip.style.top=y+'px'}
+function focusSeries(card,k,on){if(!card)return;var ch=card.querySelector('.chart');if(!ch)return;
+Array.prototype.forEach.call(ch.querySelectorAll('.ser'),function(s){s.classList.toggle('on',on&&s.getAttribute('data-k')===k)});ch.classList.toggle('focus',on)}
+function over(e){var t=e.target.closest&&e.target.closest('.pt,.lg');if(!t)return;if(t.classList.contains('pt'))showTip(t);focusSeries(t.closest('.card'),t.getAttribute('data-k'),true)}
+function out(e){var t=e.target.closest&&e.target.closest('.pt,.lg');if(!t)return;tip.style.display='none';focusSeries(t.closest('.card'),t.getAttribute('data-k'),false)}
+document.addEventListener('mouseover',over);document.addEventListener('mouseout',out);document.addEventListener('focusin',over);document.addEventListener('focusout',out);
+
+var statusEl=document.getElementById('ld-status-'+_nonce),refreshBtn=document.getElementById('ld-refresh-'+_nonce);
+function setStatus(msg,isErr){if(!statusEl)return;statusEl.textContent=msg;statusEl.className='ld-status'+(isErr?' err':'')}
+var _items=CONFIG.items||(CONFIG.item?[CONFIG.item]:[]);
+function _itemLabel(it){return it.label||it.fileName||it.filePath||it.spItemUrl||''}
+function refresh(){if(refreshBtn){refreshBtn.disabled=true;refreshBtn.innerHTML='&#x21BB; Refreshing...'}setStatus('Refreshing...');window.parent.postMessage({type:'ka-html-viewer-refresh'},'*')}
+window.refresh=refresh;
+if(refreshBtn){refreshBtn.addEventListener('click',function(){if(refreshBtn.disabled)return;refresh()})}
+var _resultsGlobal=window.__LD_RESULTS__||{},_results=[];
+for(var _ri=0;_ri<_items.length;_ri++){var _spUrl=_items[_ri].spItemUrl,_data=_resultsGlobal[_spUrl];
+if(_data){var _res={label:_itemLabel(_items[_ri]),content:_data.content==null?null:_data.content,format:_data.format||null,metadata:_data.metadata||null,error:_data.error||null,errorCode:_data.errorCode||null};
+if(_res.format==='rows'&&_res.content!=null){var _tab=loadTabular(_res);if(_tab){_res.headers=_tab.headers;_res.rows=_tab.rows;try{_res.content=JSON.stringify({headers:_tab.headers,rows:_tab.rows})}catch(_e){}}}
+_results.push(_res)}else{_results.push({label:_itemLabel(_items[_ri]),content:null,format:null,metadata:null,error:'No prefetched result for '+_spUrl,errorCode:'no-results'})}}
+setStatus('Rendering...');
+try{var hasData=false,firstErr=null;
+for(var _ci=0;_ci<_results.length;_ci++){if(_results[_ci].content!=null){hasData=true;break}if(_results[_ci].error&&!firstErr)firstErr=_results[_ci].error}
+if(!hasData){setStatus('Failed to load data: '+(firstErr||'no content'),true)}
+else{var _rendered=render(_results);
+if(typeof _rendered==='string'&&_rendered){var _c=document.getElementById('ld-content-'+_nonce);if(_c)_c.innerHTML=_rendered}
+var _rt;window.addEventListener('resize',function(){clearTimeout(_rt);_rt=setTimeout(function(){var c=document.getElementById('ld-content-'+_nonce);if(c)c.innerHTML=render(_results)},120)});
+var _now=new Date(),p2=function(v){return('0'+v).slice(-2)};
+setStatus('Loaded '+p2(_now.getHours())+':'+p2(_now.getMinutes())+':'+p2(_now.getSeconds()))}
+}catch(e){setStatus('Render error: '+(e&&e.message?e.message:String(e)),true)}
+if(refreshBtn){refreshBtn.disabled=false;refreshBtn.innerHTML='&#x21BB; Refresh'}
+})();</script>
+</main></body></html>
