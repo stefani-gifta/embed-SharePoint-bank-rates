@@ -111,7 +111,7 @@ ks.forEach(function(k){var s=series[k],last=null;
 xs.forEach(function(x){if(s.p[x]!=null)last=s.p[x]});
 meta[k]={col:BANK_COLORS[bankList.indexOf(s.b)%BANK_COLORS.length],dash:TYPE_DASH[typeList.indexOf(s.t)%TYPE_DASH.length],last:last}});
 var leg=ks.map(function(k){var s=series[k],m=meta[k];return '<div class="lg" data-k="'+esc(k)+'"><svg width="26" height="8" style="width:26px;flex:none"><line x1="2" y1="4" x2="24" y2="4" stroke="'+m.col+'" stroke-width="3" stroke-linecap="round" stroke-dasharray="'+m.dash+'"/></svg><b>'+esc(s.b)+' &ndash; '+esc(s.t)+'</b><span>Rp '+idr(m.last)+'</span></div>'}).join('');
-cEl.innerHTML='<section class="card"><p class="sub">'+c+' to IDR &middot; buy rate &middot; '+RANGE_LABEL[range]+' &middot; hover a dot for its value</p><div class="wrap"></div><div class="legend">'+leg+'</div></section>';
+cEl.innerHTML='<section class="card"><p class="sub">'+c+' to IDR &middot; buy rate &middot; '+RANGE_LABEL[range]+' &middot; hover a line/dot to show its value</p><div class="wrap"></div><div class="legend">'+leg+'</div></section>';
 var wrap=cEl.querySelector('.wrap');
 var W=Math.max(260,wrap.clientWidth-8),HH=Math.max(110,wrap.clientHeight-8);
 var vs=a.map(function(x){return x.v}),lo=Math.min.apply(null,vs),hi=Math.max.apply(null,vs),pad=(hi-lo)*.12||1;lo-=pad;hi+=pad;
