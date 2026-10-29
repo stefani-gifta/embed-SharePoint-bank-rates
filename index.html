@@ -4,9 +4,9 @@
 html,body{height:100%;margin:0;overflow:hidden}
 body{font-family:"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.4;background:var(--bg);color:var(--ink)}
 main{height:100%;display:flex;flex-direction:column;padding:8px 10px;gap:8px;overflow:hidden}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex:none;flex-wrap:wrap}
-.tabs{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.sep{width:1px;height:22px;background:var(--blue);margin:0 4px}
+.toolbar{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex:none;flex-wrap:wrap}
+.tabs{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.tabs .row{display:flex;gap:6px;flex-wrap:wrap}
 .tab{border:2px solid var(--teal);background:var(--white);color:var(--teal);font:600 14px "Segoe UI",sans-serif;padding:4px 16px;border-radius:999px;cursor:pointer;transition:background .15s,color .15s}
 .tab.rg{border-radius:8px;padding:4px 12px;font-size:13px}
 .tab:hover{background:var(--mint)}
@@ -50,13 +50,16 @@ svg{display:block}
 <script type="application/json" class="ka-livedata-manifest">[{"kind":"list","spItemUrl":"list:https://solusindocorp.sharepoint.com/sites/SolusiCopilotExperienceHub/{5094ac18-ea5b-4af0-b617-1a8e556966df}","webUrl":"https://solusindocorp.sharepoint.com/sites/SolusiCopilotExperienceHub","listId":"{5094ac18-ea5b-4af0-b617-1a8e556966df}","label":"Bank Exchange Rates"}]</script>
 <div class="toolbar">
 <div class="tabs" id="ld-tabs-yh0vne1">
+<div class="row">
 <button type="button" class="tab active" data-c="USD">USD</button>
 <button type="button" class="tab" data-c="SGD">SGD</button>
 <button type="button" class="tab" data-c="EUR">EUR</button>
-<span class="sep"></span>
-<button type="button" class="tab rg active" data-r="7">Last 7 days</button>
-<button type="button" class="tab rg" data-r="30">Last 30 days</button>
+</div>
+<div class="row">
+<button type="button" class="tab rg active" data-r="7">Last 7d</button>
+<button type="button" class="tab rg" data-r="30">Last 30d</button>
 <button type="button" class="tab rg" data-r="all">All time</button>
+</div>
 </div>
 <div class="right"><div class="ld-status" id="ld-status-yh0vne1"></div><button type="button" class="ld-refresh" id="ld-refresh-yh0vne1" title="Re-fetch the source files">&#x21BB; Refresh</button></div>
 </div>
@@ -78,7 +81,7 @@ function dkey(x){return x.getFullYear()+'-'+('0'+(x.getMonth()+1)).slice(-2)+'-'
 
 var BANK_COLORS=['#0A6A7D','#962C2C','#4A78A6','#5B8F86'];
 var TYPE_DASH=['','9 6','2 6','12 5 2 5'];
-var RANGE_LABEL={'7':'last 7 days','30':'last 30 days','all':'all time'};
+var RANGE_LABEL={'7':'last 7d','30':'last 30d','all':'all time'};
 
 var active='USD',range='7',DATA=null,ERR=null;
 
